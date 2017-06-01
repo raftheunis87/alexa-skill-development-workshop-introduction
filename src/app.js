@@ -1,101 +1,66 @@
 const Alexa = require('alexa-sdk');
 
+const WELCOME_MESSAGE = 'Welcome to this introduction skill for Alexa. Would you like me to say Hello World to you?';
+const HELP_MESSAGE = 'Would you like me to say Hello World to you?';
+const EXIT_SKILL_MESSAGE = 'Thank you for trying out this skill! Goodbye!';
+
 const states = {
-    STARTMODE: '_STARTMODE',
-    HELLOWORLDMODE: '_HELLOWORLDMODE',
+    START: '_START',
+    HELLOWORLD: '_HELLOWORLD',
 };
 
 let speech = '';
 
-module.exports.newSessionHandlers = {
-    NewSession() {
-        if (Object.keys(this.attributes).length === 0) {
-            this.attributes.helloWorldCount = 0;
-        }
-        this.handler.state = states.STARTMODE;
-        speech = 'Welcome to this introduction skill for Alexa. Would you like me to say Hello World to you?';
-        this.emit(':ask', speech, speech);
+module.exports.handlers = {
+    LaunchRequest() {
+        this.handler.state = states.START;
+        this.emitWithState('Start');
     },
     HelloWorldIntent() {
-        this.emit('HelloWorld', () => {
-            speech = `Hello world! You already made me say this ${this.attributes.helloWorldCount} times. Would you like me to say Hello World again?`;
-            this.emit(':ask', speech, speech);
-        });
+        this.handler.state = states.START;
+        this.emitWithState('HelloWorld');
     },
-    'AMAZON.StopIntent': function () {
-        this.emit(':tell', 'Goodbye!');
-    },
-    'AMAZON.CancelIntent': function () {
-        this.emit(':tell', 'Goodbye!');
-    },
-    SessionEndedRequest() {
-        this.emit(':tell', 'Goodbye!');
+    Unhandled() {
+        this.handler.state = states.START;
+        this.emitWithState('Start');
     }
 };
 
-module.exports.startModeHandlers = Alexa.CreateStateHandler(states.STARTMODE, {
-    NewSession() {
-        this.emit('NewSession'); // Uses the handler in newSessionHandlers
-    },
-    'AMAZON.HelpIntent': function () {
-        speech = 'I can say hello world to you! Do you want me to do it?';
-        this.emit(':ask', speech, speech);
+module.exports.startHandlers = Alexa.CreateStateHandler(states.START, {
+    Start() {
+        this.emit(':ask', WELCOME_MESSAGE, HELP_MESSAGE);
     },
     'AMAZON.YesIntent': function () {
-        this.handler.state = states.HELLOWORLDMODE;
-        speech = 'Are you really sure you want to hear this boring Hello World example again?';
-        this.emit(':ask', speech, speech);
-    },
-    'AMAZON.NoIntent': function () {
-        this.emit(':tell', 'Ok, see you next time!');
-    },
-    'AMAZON.StopIntent': function () {
-        this.emit(':tell', 'Goodbye!');
-    },
-    'AMAZON.CancelIntent': function () {
-        this.emit(':tell', 'Goodbye!');
-    },
-    SessionEndedRequest() {
-        this.emit(':tell', 'Goodbye!');
-    },
-    Unhandled() {
-        speech = 'Say yes to continue, or no to end.';
-        this.emit(':ask', speech, speech);
-    }
-});
-
-module.exports.helloWorldModeHandlers = Alexa.CreateStateHandler(states.HELLOWORLDMODE, {
-    NewSession() {
-        this.handler.state = '';
-        this.emit('NewSession'); // Uses the handler in newSessionHandlers
-    },
-    'AMAZON.YesIntent': function () {
-        this.emit('HelloWorld', () => {
+        this.emit('SayHelloWorld', () => {
             speech = `Hello world! You already made me say this ${this.attributes.helloWorldCount} times. Would you like me to say Hello World again?`;
-            this.emit(':ask', speech, speech);
+            this.emit(':ask', speech, speech);       
+        });
+    },
+    HelloWorld() {
+         this.emit('SayHelloWorld', () => {
+            speech = `Hello world! You already made me say this ${this.attributes.helloWorldCount} times. Would you like me to say Hello World again?`;
+            this.emit(':ask', speech, speech);       
         });
     },
     'AMAZON.NoIntent': function () {
         this.emit(':tell', 'Ok, see you next time!');
     },
     'AMAZON.StopIntent': function () {
-        this.emit(':tell', 'Goodbye!');
+        this.emit(':tell', EXIT_SKILL_MESSAGE);
     },
     'AMAZON.CancelIntent': function () {
-        this.emit(':tell', 'Goodbye!');
+        this.emit(':tell', EXIT_SKILL_MESSAGE);
     },
-    SessionEndedRequest() {
-        this.emit(':tell', 'Goodbye!');
+    'AMAZON.HelpIntent': function () {
+        this.emit(':ask', HELP_MESSAGE, HELP_MESSAGE);
     },
     Unhandled() {
-        speech = 'Say yes to continue, or no to end.';
-        this.emit(':ask', speech, speech);
+        this.emitWithState('Start');
     }
 });
 
 module.exports.generalHandlers = {
-    HelloWorld(callback) {
-        this.handler.state = states.STARTMODE;
+    SayHelloWorld(callback) {
         this.attributes.helloWorldCount++;
         callback();
     }
