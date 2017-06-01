@@ -16,6 +16,12 @@ module.exports.newSessionHandlers = {
         speech = 'Welcome to this introduction skill for Alexa. Would you like me to say Hello World to you?';
         this.emit(':ask', speech, speech);
     },
+    HelloWorldIntent() {
+        this.emit('HelloWorld', () => {
+            speech = `Hello world! You already made me say this ${this.attributes.helloWorldCount} times. Would you like me to say Hello World again?`;
+            this.emit(':ask', speech, speech);
+        });
+    },
     'AMAZON.StopIntent': function () {
         this.emit(':tell', 'Goodbye!');
     },
@@ -30,12 +36,6 @@ module.exports.newSessionHandlers = {
 module.exports.startModeHandlers = Alexa.CreateStateHandler(states.STARTMODE, {
     NewSession() {
         this.emit('NewSession'); // Uses the handler in newSessionHandlers
-    },
-    HelloWorldIntent() {
-        this.emit('HelloWorld', () => {
-            speech = 'Hello world! Would you like me to say Hello World again?';
-            this.emit(':ask', speech, speech);
-        });
     },
     'AMAZON.HelpIntent': function () {
         speech = 'I can say hello world to you! Do you want me to do it?';
