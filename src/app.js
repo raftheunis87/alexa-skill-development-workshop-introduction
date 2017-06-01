@@ -61,6 +61,9 @@ module.exports.startHandlers = Alexa.CreateStateHandler(states.START, {
 
 module.exports.generalHandlers = {
     SayHelloWorld(callback) {
+        if (Object.keys(this.attributes).length === 0) {
+            this.attributes.helloWorldCount = 0;
+        }
         this.attributes.helloWorldCount++;
         callback();
     }
