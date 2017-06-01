@@ -33,13 +33,13 @@ module.exports.startHandlers = Alexa.CreateStateHandler(states.START, {
     'AMAZON.YesIntent': function () {
         this.emit('SayHelloWorld', () => {
             speech = `Hello world! You already made me say this ${this.attributes.helloWorldCount} times. Would you like me to say Hello World again?`;
-            this.emit(':ask', speech, speech);       
+            this.emit(':ask', speech, speech);
         });
     },
     HelloWorld() {
-         this.emit('SayHelloWorld', () => {
+        this.emit('SayHelloWorld', () => {
             speech = `Hello world! You already made me say this ${this.attributes.helloWorldCount} times. Would you like me to say Hello World again?`;
-            this.emit(':ask', speech, speech);       
+            this.emit(':ask', speech, speech);
         });
     },
     'AMAZON.NoIntent': function () {
@@ -61,9 +61,7 @@ module.exports.startHandlers = Alexa.CreateStateHandler(states.START, {
 
 module.exports.generalHandlers = {
     SayHelloWorld(callback) {
-        console.log('typeof: ', typeof this.attributes.helloWorldCount);
-       
-        if (Object.keys(this.attributes).length === 0) {
+        if (typeof this.attributes.helloWorldCount === 'undefined') {
             this.attributes.helloWorldCount = 0;
         }
         this.attributes.helloWorldCount++;
