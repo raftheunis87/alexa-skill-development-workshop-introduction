@@ -71,7 +71,7 @@ module.exports.helloWorldModeHandlers = Alexa.CreateStateHandler(states.HELLOWOR
     },
     'AMAZON.YesIntent': function () {
         this.emit('HelloWorld', () => {
-            speech = 'Hello world! Would you like me to say Hello World again?';
+            speech = `Hello world! You already made me say this ${this.attributes.helloWorldCount} times. Would you like me to say Hello World again?`;
             this.emit(':ask', speech, speech);
         });
     },
